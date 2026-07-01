@@ -35,7 +35,7 @@ If you copied this project from GitHub and want to run it locally, follow these 
 ### 1. Clone the project
 
 ```bash
-git clone <your-repo-url>
+git clone git@github.com:MahfujuRahman/viserx.git
 cd viserx
 ```
 
