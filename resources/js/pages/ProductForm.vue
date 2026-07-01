@@ -103,6 +103,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 import { api } from '../services/api';
 
 const route = useRoute();
@@ -145,15 +146,34 @@ async function handleSubmit() {
     try {
         if (isEdit.value) {
             await api.put(`products/${route.params.id}`, form.value);
+            await Swal.fire({
+                title: 'Updated!',
+                text: 'The product has been updated successfully.',
+                icon: 'success',
+                confirmButtonColor: '#4f46e5',
+            });
         } else {
             await api.post('products', form.value);
+            await Swal.fire({
+                title: 'Created!',
+                text: 'The product has been created successfully.',
+                icon: 'success',
+                confirmButtonColor: '#4f46e5',
+            });
         }
         router.push('/products');
     } catch (e) {
         const data = e.response?.data;
-        error.value = data?.errors
+        const message = data?.errors
             ? Object.values(data.errors).flat().join(', ')
             : data?.message || 'Failed to save product';
+        error.value = message;
+        await Swal.fire({
+            title: 'Save failed',
+            text: message,
+            icon: 'error',
+            confirmButtonColor: '#4f46e5',
+        });
     } finally {
         loading.value = false;
     }

@@ -105,6 +105,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
 import Pagination from '../components/Pagination.vue';
 import { api } from '../services/api';
 
@@ -157,12 +158,34 @@ function handlePageChange(page) {
 }
 
 async function deleteProduct(id) {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    const result = await Swal.fire({
+        title: 'Delete product?',
+        text: 'This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc2626',
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
         await api.delete(`products/${id}`);
         await fetchProducts();
+        await Swal.fire({
+            title: 'Deleted!',
+            text: 'The product has been deleted.',
+            icon: 'success',
+            confirmButtonColor: '#4f46e5',
+        });
     } catch (e) {
-        alert('Failed to delete product');
+        await Swal.fire({
+            title: 'Delete failed',
+            text: e?.response?.data?.message || 'Failed to delete product',
+            icon: 'error',
+            confirmButtonColor: '#4f46e5',
+        });
     }
 }
 
