@@ -1,6 +1,6 @@
-# Product CRUD App
+# ViserX
 
-A Laravel 12 + Vue 3 single-page application for managing products and categories with JWT authentication and queued email notifications.
+This is a Laravel 12 + Vue 3 single-page application for managing products and categories with JWT authentication, queued email notifications, and a ready-to-import Postman collection.
 
 ## Features
 
@@ -25,9 +25,10 @@ A Laravel 12 + Vue 3 single-page application for managing products and categorie
 - PHP 8.2 or higher
 - Composer
 - Node.js and npm
-- SQLite enabled in PHP
+- A database server: SQLite or MySQL
+- SMTP credentials for email delivery if you want real email sending
 
-## First-Time Setup
+## Getting Started
 
 If you copied this project from GitHub and want to run it locally, follow these steps in order.
 
@@ -61,7 +62,9 @@ php artisan key:generate
 
 ### 5. Configure `.env`
 
-Update these values in `.env`:
+Choose one database setup below and update `.env` accordingly.
+
+SQLite setup:
 
 ```env
 APP_URL=http://127.0.0.1:8000
@@ -70,20 +73,38 @@ QUEUE_CONNECTION=database
 SESSION_DRIVER=database
 CACHE_STORE=database
 MAIL_MAILER=log
-VITE_APP_NAME="Product CRUD App"
+VITE_APP_NAME="ViserX"
+VITE_API_BASE_URL=http://127.0.0.1:8000/api
 ```
 
-If you want the frontend to call Laravel directly during local development, you can also set:
+If you use SQLite, keep `database/database.sqlite` in place. Laravel will use that file by default.
+
+MySQL setup:
 
 ```env
+APP_URL=http://127.0.0.1:8000
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=viserx
+DB_USERNAME=root
+DB_PASSWORD=
+QUEUE_CONNECTION=database
+SESSION_DRIVER=database
+CACHE_STORE=database
+MAIL_MAILER=log
+VITE_APP_NAME="ViserX"
 VITE_API_BASE_URL=http://127.0.0.1:8000/api
-FRONTEND_URL=http://127.0.0.1:5173
-VITE_DEV_ORIGIN=http://127.0.0.1:5173
 ```
 
-### 6. Create the SQLite database file
+Notes:
 
-Make sure this file exists:
+- The frontend currently reads `VITE_API_BASE_URL` only.
+- `FRONTEND_URL` and `VITE_DEV_ORIGIN` are not used by this project.
+
+### 6. Prepare the database
+
+If you selected SQLite, make sure this file exists:
 
 ```text
 database/database.sqlite
@@ -94,6 +115,8 @@ If it is missing, create it with:
 ```powershell
 New-Item -ItemType File database/database.sqlite -Force
 ```
+
+If you selected MySQL, create a database named `viserx` or update `DB_DATABASE` to match your database name.
 
 ### 7. Generate the JWT secret
 
@@ -109,17 +132,9 @@ php artisan migrate --seed
 
 This will create the database tables and seed demo data.
 
-### 9. Build the frontend assets
-
-```bash
-npm run build
-```
-
-For local development, you can skip the build and use the Vite dev server instead.
-
 ## Run the Project
 
-Open two terminals.
+Open three terminals.
 
 ### Terminal 1: start Laravel
 
@@ -133,9 +148,9 @@ php artisan serve
 npm run dev
 ```
 
-### Optional Terminal 3: run the queue worker
+### Terminal 3: run the queue worker
 
-The product create/update email notification is queued, so run a worker in a third terminal:
+The product create/update email notification is queued, so the worker must be running while you use the app:
 
 ```bash
 php artisan queue:work
@@ -165,6 +180,34 @@ php artisan migrate --seed
 ```
 
 Use those commands if you want the JWT auth secret and the demo seed data.
+It does not start the queue worker, so keep `php artisan queue:work` running separately.
+
+## SMTP Mail Setup
+
+The application uses Laravel's mail configuration in `config/mail.php`. If you want real email delivery instead of log output, set these values in `.env`:
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=587
+MAIL_USERNAME=your-smtp-username
+MAIL_PASSWORD=your-smtp-password
+MAIL_SCHEME=tls
+MAIL_FROM_ADDRESS=hello@example.com
+MAIL_FROM_NAME="ViserX"
+```
+
+If you are using a different SMTP provider, replace the host, port, username, and password with the values from that provider.
+
+## Postman Collection
+
+The API collection is included in the project root:
+
+```text
+ViserX.postman_collection.json
+```
+
+Import that file into Postman to test the authentication, categories, and products endpoints.
 
 ## Demo Credentials
 
