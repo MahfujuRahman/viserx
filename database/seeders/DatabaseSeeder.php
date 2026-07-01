@@ -24,28 +24,22 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        $electronics = Category::create([
-            'name' => 'Electronics',
-            'description' => 'Devices, gadgets, and accessories.',
-        ]);
+        // 2. Loop to create 20 categories
+        for ($i = 1; $i <= 20; $i++) {
+            $category = Category::create([
+                'name' => "Category {$i}",
+                'description' => "Description for category number {$i}.",
+            ]);
 
-        $office = Category::create([
-            'name' => 'Office',
-            'description' => 'Work essentials for a modern workspace.',
-        ]);
-
-        Product::create([
-            'name' => 'Wireless Keyboard',
-            'description' => 'A slim wireless keyboard with quiet keys.',
-            'price' => 59.99,
-            'category_id' => $office->id,
-        ]);
-
-        Product::create([
-            'name' => 'Noise-Cancelling Headphones',
-            'description' => 'Comfortable headphones for focused work and travel.',
-            'price' => 129.00,
-            'category_id' => $electronics->id,
-        ]);
+            // 3. For each category, loop to create 5 products
+            for ($j = 1; $j <= 5; $j++) {
+                Product::create([
+                    'name' => "Product {$j} of Category {$i}",
+                    'description' => "This is the description for product {$j}.",
+                    'price' => rand(10, 200) + 0.99, // Generates a random price like 45.99
+                    'category_id' => $category->id,
+                ]);
+            }
+        }
     }
 }
